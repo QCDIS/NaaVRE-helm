@@ -10,8 +10,16 @@ updates:
       - dependency-name: naavre-workflow-service
       - dependency-name: naavre-paas-frontend
     ignore:
-      - dependency-name: "*" # Wildcard ignores all dependencies
+      - dependency-name: "argo-workflows"
         update-types: ["version-update:semver-major", "version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "jupyterhub"
+        update-types: [ "version-update:semver-major", "version-update:semver-minor", "version-update:semver-patch" ]
+      - dependency-name: "seaweedfs"
+        update-types: [ "version-update:semver-major", "version-update:semver-minor", "version-update:semver-patch" ]
+      - dependency-name: "postgresql"
+        update-types: [ "version-update:semver-major", "version-update:semver-minor", "version-update:semver-patch" ]
+      - dependency-name: "postgresql"
+        update-types: [ "version-update:semver-major", "version-update:semver-minor", "version-update:semver-patch" ]
     schedule:
       interval: "weekly"
     registries:
@@ -21,5 +29,5 @@ registries:
   qcdis-helm-repo:
     type: helm-registry
     url: oci://ghcr.io/qcdis/charts
-    username: "user"
-    password: "pwd"
+    username: ""
+    password: ""
