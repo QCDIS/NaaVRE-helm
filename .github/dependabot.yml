@@ -27,6 +27,7 @@ updates:
     registries:
       - qcdis-helm-repo
       - seaweedfs-helm-repo
+      - jupyterhub-helm-repo
 
 registries:
   qcdis-helm-repo:
@@ -37,5 +38,10 @@ registries:
   seaweedfs-helm-repo:
     type: helm-registry
     url: https://seaweedfs.github.io/seaweedfs/helm
+    username: ""
+    password: ""
+  jupyterhub-helm-repo:
+    type: helm-registry
+    url: https://jupyterhub.github.io/helm-chart/
     username: ""
     password: ""
