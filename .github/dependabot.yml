@@ -4,18 +4,18 @@ updates:
   - package-ecosystem: "helm"
     directory: "/naavre"
     allow:
-      - dependency-name: seaweedfs
+      - dependency-name: k8s-secret-creator
     ignore:
       - dependency-name: "*" # Wildcard ignores all dependencies
         update-types: ["version-update:semver-major", "version-update:semver-minor", "version-update:semver-patch"]
     schedule:
       interval: "weekly"
     registries:
-      - seaweedfs-helm-repo
+      - qcdis-helm-repo
 
 registries:
-  seaweedfs-helm-repo:
+  qcdis-helm-repo:
     type: helm-registry
-    url: https://seaweedfs.github.io/seaweedfs/helm
+    url: oci://ghcr.io/qcdis/charts
     username: ""
     password: ""
