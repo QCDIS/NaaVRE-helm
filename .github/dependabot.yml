@@ -5,6 +5,9 @@ updates:
     directory: "/naavre"
     allow:
       - dependency-name: seaweedfs
+    ignore:
+      - dependency-name: "*" # Wildcard ignores all dependencies
+        update-types: ["version-update:semver-major", "version-update:semver-minor", "version-update:semver-patch"]
     schedule:
       interval: "weekly"
     registries:
