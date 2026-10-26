@@ -26,10 +26,16 @@ updates:
       interval: "weekly"
     registries:
       - qcdis-helm-repo
+      - seaweedfs-helm-repo
 
 registries:
   qcdis-helm-repo:
     type: helm-registry
     url: oci://ghcr.io/qcdis/charts
+    username: ""
+    password: ""
+  seaweedfs-helm-repo:
+    type: helm-registry
+    url: https://seaweedfs.github.io/seaweedfs/helm
     username: ""
     password: ""
