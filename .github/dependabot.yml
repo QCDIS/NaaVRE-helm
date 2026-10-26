@@ -21,5 +21,5 @@ registries:
   qcdis-helm-repo:
     type: helm-registry
     url: oci://ghcr.io/qcdis/charts
-    username: ""
-    password: ""
+    username: "user"
+    password: "pwd"
