@@ -5,6 +5,10 @@ updates:
     directory: "/naavre"
     allow:
       - dependency-name: k8s-secret-creator
+      - dependency-name: naavre-catalogue-service
+      - dependency-name: naavre-containerizer-service
+      - dependency-name: naavre-workflow-service
+      - dependency-name: naavre-paas-frontend
     ignore:
       - dependency-name: "*" # Wildcard ignores all dependencies
         update-types: ["version-update:semver-major", "version-update:semver-minor", "version-update:semver-patch"]
