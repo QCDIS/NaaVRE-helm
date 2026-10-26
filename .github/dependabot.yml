@@ -42,6 +42,6 @@ registries:
     password: ""
   jupyterhub-helm-repo:
     type: helm-registry
-    url: https://jupyterhub.github.io/helm-chart/
+    url: https://jupyterhub.github.io/helm-chart/index.yaml
     username: ""
     password: ""
