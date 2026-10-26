@@ -12,16 +12,10 @@ updates:
       interval: "weekly"
     registries:
       - seaweedfs-helm-repo
-      - jupyterhub-helm-repo
 
 registries:
   seaweedfs-helm-repo:
     type: helm-registry
     url: https://seaweedfs.github.io/seaweedfs/helm
-    username: ""
-    password: ""
-  jupyterhub-helm-repo:
-    type: helm-registry
-    url: https://jupyterhub.github.io/helm-chart/helm
     username: ""
     password: ""
