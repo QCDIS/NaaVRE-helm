@@ -19,11 +19,17 @@ updates:
       - dependency-name: "postgresql"
         update-types: [ "version-update:semver-major", "version-update:semver-minor", "version-update:semver-patch" ]
     schedule:
-      interval: "weekly"
+      interval: "daily"
     registries:
       - qcdis-helm-repo
       - seaweedfs-helm-repo
       - jupyterhub-helm-repo
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
 
 registries:
   qcdis-helm-repo:
