@@ -46,7 +46,7 @@ dependencies:
     repository: "https://charts.bitnami.com/bitnami"
     condition: keycloak-db.enabled
   - name: "naavre-catalogue-service"
-    version: "v0.6.10"
+    version: v0.6.12
     repository: "oci://ghcr.io/naavre/charts"
     condition: naavre-catalogue-service.enabled
   - name: "naavre-containerizer-service"
