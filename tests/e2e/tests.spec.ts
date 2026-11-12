@@ -97,6 +97,30 @@ test.describe('login', () => {
     await expect(page.getByRole('textbox', { name: 'Password' })).toBeVisible();
   });
 
+  test('keeps user on login page when username is empty', async ({ page }) => {
+    await openLoginPage(page);
+    const loginUrl = page.url();
+
+    await page.getByRole('textbox', { name: 'Password' }).fill(validPassword);
+    await page.getByRole('button', { name: /sign in/i }).click();
+
+    expect(page.url()).toBe(loginUrl);
+    await expect(page.getByRole('textbox', { name: 'Username or email' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Password' })).toBeVisible();
+  });
+
+  test('keeps user on login page when password is empty', async ({ page }) => {
+    await openLoginPage(page);
+    const loginUrl = page.url();
+
+    await page.getByRole('textbox', { name: 'Username or email' }).fill(validUsername);
+    await page.getByRole('button', { name: /sign in/i }).click();
+
+    expect(page.url()).toBe(loginUrl);
+    await expect(page.getByRole('textbox', { name: 'Username or email' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Password' })).toBeVisible();
+  });
+
   test('rejects invalid credentials', async ({ page }) => {
     await openLoginPage(page);
     await login(page, 'invalid-user', 'invalid-password');
