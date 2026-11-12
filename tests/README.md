@@ -12,6 +12,25 @@ end-to-end tests:
 ```bash
 npx playwright test
 ```    
+
+Use environment variables to target a deployment and credentials:
+```bash
+E2E_BASE_URL="https://<host>/vreapp" \
+E2E_JUPYTERHUB_URL="https://<host>/jhub" \
+E2E_USERNAME="<username>" \
+E2E_PASSWORD="<password>" \
+npx playwright test
+```
+
+For deployments with custom UI labels/selectors, you can override journey actions:
+```bash
+E2E_START_LAB_SELECTOR="<css-selector>" \
+E2E_NEW_NOTEBOOK_SELECTOR="<css-selector>" \
+E2E_CONTAINERIZE_SELECTOR="<css-selector>" \
+E2E_CREATE_WORKFLOW_SELECTOR="<css-selector>" \
+E2E_RUN_WORKFLOW_SELECTOR="<css-selector>" \
+npx playwright test
+```
 Interactive UI mode:
 ```bash
 npx playwright test --ui
@@ -50,14 +69,13 @@ The following features are planned to be tested:
 
 - [x] Basic navigation to VRE app
 - [x] Login functionality
-- [ ] Browse labs
-- [ ] Create notebook
-- [ ] Create containers
-- [ ] Build workflow
-- [ ] Execute workflow
+- [x] Browse labs
+- [x] Create notebook
+- [x] Create containers
+- [x] Build workflow
+- [x] Execute workflow
 
 ## Screenshots
 
 Test screenshots are saved to the `screenshots/` directory during test runs.
-
 
