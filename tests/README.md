@@ -1,5 +1,10 @@
 # NaaVRE UI Tests
 
+Install dependencies:
+
+```bash
+npm install
+```
 
 ## Running Tests
 

@@ -6,3 +6,4 @@ dependencies:
   - kubernetes-helm
   - nodejs
   - playwright
+  - npx

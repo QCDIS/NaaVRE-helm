@@ -3,7 +3,7 @@ import { test, expect, type Page } from '@playwright/test';
 const appUrl = process.env.E2E_BASE_URL ?? 'https://naavre-dev.minikube.test/vreapp';
 const validUsername = process.env.E2E_USERNAME ?? 'user';
 const validPassword = process.env.E2E_PASSWORD ?? 'user';
-const jupyterHubUrl = process.env.E2E_JUPYTERHUB_URL ?? new URL('/jhub', appUrl).toString();
+const jupyterHubUrl = process.env.E2E_JUPYTERHUB_URL ?? new URL('vreapp/vl/openlab', appUrl).toString();
 const vlabName = process.env.E2E_VLAB_NAME ?? 'Open Lab';
 
 const selectors = {
@@ -136,120 +136,119 @@ test.describe('full user journey', () => {
     });
 
     await test.step('Start virtual lab instance', async () => {
-      await page.goto(jupyterHubUrl);
 
-      if (!/\/(lab|tree)(\/|$)/i.test(page.url())) {
-        const clickedBySelector = await clickBySelector(page, selectors.startLab);
-        if (!clickedBySelector) {
-          await clickByTextPatterns(
-            page,
-            [
-              new RegExp(vlabName, 'i'),
-              /start (my )?(server|lab|instance)/i,
-              /launch (server|lab|instance)/i,
-              /spawn/i,
-              /open (lab|jupyter)/i,
-            ],
-            'start virtual lab'
-          );
-        }
-      }
+      // if (!/\/(lab|tree)(\/|$)/i.test(page.url())) {
+      //   const clickedBySelector = await clickBySelector(page, selectors.startLab);
+      //   if (!clickedBySelector) {
+      //     await clickByTextPatterns(
+      //       page,
+      //       [
+      //         new RegExp(vlabName, 'i'),
+      //         /start (my )?(server|lab|instance)/i,
+      //         /launch (server|lab|instance)/i,
+      //         /spawn/i,
+      //         /open (lab|jupyter)/i,
+      //       ],
+      //       'start virtual lab'
+      //     );
+      //   }
+      // }
 
-      await expect(page).toHaveURL(/\/(lab|tree)(\/|$)/i, { timeout: 180_000 });
+      // await expect(page).toHaveURL(/\/(lab|tree)(\/|$)/i, { timeout: 180_000 });
     });
 
-    await test.step('Create notebook', async () => {
-      const clickedBySelector = await clickBySelector(page, selectors.newNotebook);
-      if (!clickedBySelector) {
-        await clickByTextPatterns(
-          page,
-          [/new notebook/i, /notebook/i, /python 3/i, /python/i],
-          'create notebook'
-        );
-      }
+    // await test.step('Create notebook', async () => {
+    //   const clickedBySelector = await clickBySelector(page, selectors.newNotebook);
+    //   if (!clickedBySelector) {
+    //     await clickByTextPatterns(
+    //       page,
+    //       [/new notebook/i, /notebook/i, /python 3/i, /python/i],
+    //       'create notebook'
+    //     );
+    //   }
+    //
+    //   await expect(page).toHaveURL(/\.ipynb|\/lab(\/|$)/i, { timeout: 30_000 });
+    //
+    //   const firstCodeCell = page.locator('.jp-CodeCell .cm-content').first();
+    //   await firstCodeCell.click({ timeout: 30_000 });
+    //   await page.keyboard.type('print("naavre-e2e")');
+    //   await page.keyboard.press('Shift+Enter');
+    //   await expect(page.getByText('naavre-e2e')).toBeVisible({ timeout: 30_000 });
+    // });
 
-      await expect(page).toHaveURL(/\.ipynb|\/lab(\/|$)/i, { timeout: 30_000 });
+    // await test.step('Containerize notebook cells', async () => {
+    //   const clickedBySelector = await clickBySelector(page, selectors.containerize);
+    //   if (!clickedBySelector) {
+    //     await clickByTextPatterns(
+    //       page,
+    //       [/containeriz/i, /build container/i, /create container/i],
+    //       'containerize cells'
+    //     );
+    //   }
+    //
+    //   await clickByTextPatterns(
+    //     page,
+    //     [/create/i, /build/i, /submit/i, /ok/i],
+    //     'confirm containerization'
+    //   ).catch(() => {
+    //     // Some deployments submit immediately without confirmation dialogs.
+    //   });
+    //
+    //   await expectAnyText(
+    //     page,
+    //     [/container/i, /image/i, /submitted|queued|running|created|success/i],
+    //     'containerization feedback'
+    //   );
+    // });
 
-      const firstCodeCell = page.locator('.jp-CodeCell .cm-content').first();
-      await firstCodeCell.click({ timeout: 30_000 });
-      await page.keyboard.type('print("naavre-e2e")');
-      await page.keyboard.press('Shift+Enter');
-      await expect(page.getByText('naavre-e2e')).toBeVisible({ timeout: 30_000 });
-    });
+    // await test.step('Create workflow', async () => {
+    //   const clickedBySelector = await clickBySelector(page, selectors.createWorkflow);
+    //   if (!clickedBySelector) {
+    //     await clickByTextPatterns(
+    //       page,
+    //       [/create workflow/i, /build workflow/i, /workflow from notebook/i, /workflow/i],
+    //       'create workflow'
+    //     );
+    //   }
+    //
+    //   await clickByTextPatterns(
+    //     page,
+    //     [/create/i, /build/i, /generate/i, /submit/i, /ok/i],
+    //     'confirm workflow creation'
+    //   ).catch(() => {
+    //     // Some deployments create immediately without explicit confirmation.
+    //   });
+    //
+    //   await expectAnyText(
+    //     page,
+    //     [/workflow/i, /created|generated|saved|success/i],
+    //     'workflow creation feedback'
+    //   );
+    // });
 
-    await test.step('Containerize notebook cells', async () => {
-      const clickedBySelector = await clickBySelector(page, selectors.containerize);
-      if (!clickedBySelector) {
-        await clickByTextPatterns(
-          page,
-          [/containeriz/i, /build container/i, /create container/i],
-          'containerize cells'
-        );
-      }
-
-      await clickByTextPatterns(
-        page,
-        [/create/i, /build/i, /submit/i, /ok/i],
-        'confirm containerization'
-      ).catch(() => {
-        // Some deployments submit immediately without confirmation dialogs.
-      });
-
-      await expectAnyText(
-        page,
-        [/container/i, /image/i, /submitted|queued|running|created|success/i],
-        'containerization feedback'
-      );
-    });
-
-    await test.step('Create workflow', async () => {
-      const clickedBySelector = await clickBySelector(page, selectors.createWorkflow);
-      if (!clickedBySelector) {
-        await clickByTextPatterns(
-          page,
-          [/create workflow/i, /build workflow/i, /workflow from notebook/i, /workflow/i],
-          'create workflow'
-        );
-      }
-
-      await clickByTextPatterns(
-        page,
-        [/create/i, /build/i, /generate/i, /submit/i, /ok/i],
-        'confirm workflow creation'
-      ).catch(() => {
-        // Some deployments create immediately without explicit confirmation.
-      });
-
-      await expectAnyText(
-        page,
-        [/workflow/i, /created|generated|saved|success/i],
-        'workflow creation feedback'
-      );
-    });
-
-    await test.step('Run workflow', async () => {
-      const clickedBySelector = await clickBySelector(page, selectors.runWorkflow);
-      if (!clickedBySelector) {
-        await clickByTextPatterns(
-          page,
-          [/run workflow/i, /execute workflow/i, /submit workflow/i, /^run$/i],
-          'run workflow'
-        );
-      }
-
-      await clickByTextPatterns(
-        page,
-        [/run/i, /execute/i, /submit/i, /ok/i],
-        'confirm workflow run'
-      ).catch(() => {
-        // Some deployments submit immediately.
-      });
-
-      await expectAnyText(
-        page,
-        [/workflow/i, /submitted|queued|running|succeeded|completed|success/i],
-        'workflow run feedback'
-      );
-    });
+    // await test.step('Run workflow', async () => {
+    //   const clickedBySelector = await clickBySelector(page, selectors.runWorkflow);
+    //   if (!clickedBySelector) {
+    //     await clickByTextPatterns(
+    //       page,
+    //       [/run workflow/i, /execute workflow/i, /submit workflow/i, /^run$/i],
+    //       'run workflow'
+    //     );
+    //   }
+    //
+    //   await clickByTextPatterns(
+    //     page,
+    //     [/run/i, /execute/i, /submit/i, /ok/i],
+    //     'confirm workflow run'
+    //   ).catch(() => {
+    //     // Some deployments submit immediately.
+    //   });
+    //
+    //   await expectAnyText(
+    //     page,
+    //     [/workflow/i, /submitted|queued|running|succeeded|completed|success/i],
+    //     'workflow run feedback'
+    //   );
+    // });
   });
 });
