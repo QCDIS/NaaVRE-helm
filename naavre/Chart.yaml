@@ -50,7 +50,7 @@ dependencies:
     repository: "oci://ghcr.io/naavre/charts"
     condition: naavre-catalogue-service.enabled
   - name: "naavre-containerizer-service"
-    version: v0.4.10
+    version: v0.4.12
     repository: "oci://ghcr.io/naavre/charts"
     condition: naavre-containerizer-service.enabled
   - name: "naavre-workflow-service"
