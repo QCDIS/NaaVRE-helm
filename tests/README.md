@@ -21,7 +21,7 @@ npx playwright test
 Use environment variables to target a deployment and credentials:
 ```bash
 E2E_BASE_URL="https://<host>/vreapp" \
-E2E_JUPYTERHUB_URL="https://<host>/jhub" \
+E2E_JUPYTERHUB_URL="https://<host>/vreapp/vl/openlab" \
 E2E_USERNAME="<username>" \
 E2E_PASSWORD="<password>" \
 npx playwright test
@@ -35,6 +35,18 @@ E2E_CONTAINERIZE_SELECTOR="<css-selector>" \
 E2E_CREATE_WORKFLOW_SELECTOR="<css-selector>" \
 E2E_RUN_WORKFLOW_SELECTOR="<css-selector>" \
 npx playwright test
+```
+
+Run only the end-to-end journey test:
+```bash
+npx playwright test -g "full user journey"
+```
+
+Optional variables for notebook run assertions:
+```bash
+E2E_NOTEBOOK_NAME="naavre-e2e-notebook" \
+E2E_CELL_OUTPUT_PROBE="naavre-e2e-cell-ok" \
+npx playwright test -g "full user journey"
 ```
 Interactive UI mode:
 ```bash
@@ -68,9 +80,9 @@ Visit https://playwright.dev/docs/intro for more information.
 
 
 
-## Planned Test Coverage
+## Test Coverage
 
-The following features are planned to be tested:
+The following features are covered:
 
 - [x] Basic navigation to VRE app
 - [x] Login functionality
