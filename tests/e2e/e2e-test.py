@@ -1,155 +1,89 @@
+import os
+
 import pytest
-import re
 from playwright.sync_api import Page, expect
 
 
+APP_URL = os.getenv("E2E_BASE_URL", "https://naavre-dev.minikube.test/vreapp")
+JUPYTER_WORKSPACE_URL = os.getenv(
+    "E2E_WORKSPACE_URL",
+    "https://naavre-dev.minikube.test/jupyter/user/user/lab/workspaces/openlab",
+)
+USERNAME = os.getenv("E2E_USERNAME", "user")
+PASSWORD = os.getenv("E2E_PASSWORD", "user")
+
+
 @pytest.fixture(scope="session")
-def browser_context_args(browser_context_args, playwright):
-    return {"ignore_https_errors": True}
+def browser_context_args(browser_context_args):
+    return {**browser_context_args, "ignore_https_errors": True}
 
 
-def test_example(page: Page) -> None:
-    page.goto("https://naavre-dev.minikube.test/vreapp")
+@pytest.fixture
+def authenticated_page(page: Page) -> Page:
+    page.goto(APP_URL)
     page.get_by_role("link", name="NaaVRE Open Lab").click()
     page.get_by_role("link", name="Login to see details").click()
-    page.get_by_role("textbox", name="Username or email").click()
-    page.get_by_role("textbox", name="Username or email").fill("user")
-    page.get_by_role("textbox", name="Password").click()
-    page.get_by_role("textbox", name="Password").fill("user")
+    page.get_by_role("textbox", name="Username or email").fill(USERNAME)
+    page.get_by_role("textbox", name="Password").fill(PASSWORD)
     page.get_by_role("button", name="Sign In").click()
-    with page.expect_popup() as page1_info:
-        page.get_by_role("button", name="Start Virtual Lab").click()
-    page1 = page1_info.value
-    page1.goto("https://naavre-dev.minikube.test/jupyter/user/user/lab/workspaces/openlab")
-    page1.locator(".jp-LauncherCard-icon").first.click()
-    page1.locator(".cm-line").first.click()
-    page1.get_by_role("textbox").fill("# input_list")
-    page1.get_by_role("textbox").press("ArrowLeft")
-    page1.get_by_role("textbox").press("ArrowLeft")
-    page1.get_by_role("textbox").press("ArrowLeft")
-    page1.get_by_role("textbox").press("ArrowLeft")
-    page1.get_by_role("textbox").fill("# input-list")
-    page1.get_by_role("textbox").press("End")
-    page1.get_by_role("textbox").fill("# input-list\n\n\nstr_list = ['a','b','c','d']")
-    page1.get_by_role("textbox").press("ControlOrMeta+s")
-    page1.get_by_role("button", name="Rename").click()
-    page1.get_by_label("notebook content").get_by_role("button", name="Insert a cell below (B)").click()
-    page1.locator(".lm-Widget.jp-CodeMirrorEditor.jp-Editor.jp-InputArea-editor.jp-mod-at-line-beginning > .cm-editor > .cm-scroller > .cm-content > .cm-line").click()
-    page1.get_by_role("textbox").filter(has_text=re.compile(r"^$")).fill("# proc\n\n\nnew_lines = []\nfor line in str_list:\n    line += ''")
-    page1.get_by_role("textbox").filter(has_text=re.compile(r"^$")).press("ArrowLeft")
-    page1.get_by_role("textbox").filter(has_text=re.compile(r"^$")).fill("# proc\n\n\nnew_lines = []\nfor line in str_list:\n    line += 'proc'")
-    page1.get_by_role("textbox").filter(has_text=re.compile(r"^$")).press("ArrowRight")
-    page1.get_by_role("textbox").filter(has_text=re.compile(r"^$")).press("End")
-    page1.get_by_role("textbox").filter(has_text=re.compile(r"^$")).fill("# proc\n\n\nnew_lines = []\nfor line in str_list:\n    line += 'proc'\n    new_lines.append(line)")
-    page1.get_by_role("textbox").filter(has_text=re.compile(r"^$")).press("ControlOrMeta+s")
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.get_by_label("Code Cell Content").nth(1).press("Enter")
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.get_by_label("Code Cell Content").nth(1).press("Enter")
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".jp-WindowedPanel-outer").click()
-    page1.locator(".lm-Widget.jp-CodeMirrorEditor.jp-Editor.jp-InputArea-editor.jp-mod-at-line-beginning > .cm-editor > .cm-scroller > .cm-content > .cm-line").first.click()
-    page1.get_by_role("textbox").nth(2).fill("# asssert\n\n\nassert new_lines == ['a','b','c','d']")
-    page1.get_by_role("textbox").nth(2).press("ControlOrMeta+s")
-    page1.get_by_role("button", name="Restart the kernel and run").click()
-    page1.get_by_role("button", name="Confirm Kernel Restart").click()
-    page1.get_by_text("'a'").nth(1).click()
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowLeft")
-    page1.get_by_text("# asssertassert new_lines").fill("# asssert\n\n\nassert new_lines == ['a_proc','b','c','d']")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowLeft")
-    page1.get_by_text("# asssertassert new_lines").fill("# asssert\n\n\nassert new_lines == ['a_proc','b_proc','c','d']")
-    page1.get_by_text("# asssertassert new_lines").press("ControlOrMeta+s")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").fill("# asssert\n\n\nassert new_lines == ['a_proc','b_proc','c_proc','d']")
-    page1.get_by_text("# asssertassert new_lines").press("ControlOrMeta+s")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").fill("# asssert\n\n\nassert new_lines == ['a_proc','b_proc','c_proc','d-proc']")
-    page1.get_by_text("# asssertassert new_lines").press("ControlOrMeta+s")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowLeft")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowLeft")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowLeft")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowLeft")
-    page1.get_by_text("# asssertassert new_lines").fill("# asssert\n\n\nassert new_lines == ['a_proc','b_proc','c_proc','d_proc']")
-    page1.get_by_text("# asssertassert new_lines").press("ControlOrMeta+s")
-    page1.get_by_role("button", name="Run this cell and advance (").click()
-    page1.get_by_text("'a_proc'").first.click()
-    page1.get_by_text("'a_proc'").first.click()
-    page1.get_by_text("# asssertassert new_lines").press("ArrowLeft")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowLeft")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowLeft")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ArrowRight")
-    page1.get_by_text("# asssertassert new_lines").press("ControlOrMeta+s")
-    page1.get_by_role("button", name="Run this cell and advance (").click()
-    page1.locator(".cm-content > div:nth-child(2)").first.click()
-    page1.get_by_role("tab", name="NaaVRE containerizer").get_by_role("img").click()
-    page1.get_by_role("button", name="Analyze cell").click()
-    page1.locator("#combo-box-demo").click()
-    page1.get_by_role("option", name="python").click()
-    page1.get_by_role("button", name="Containerize").click()
-    page1.locator("div:nth-child(2) > .cm-editor > .cm-scroller > .cm-content > div:nth-child(2)").first.click()
-    page1.get_by_role("button", name="Analyze cell").click()
-    page1.locator("#combo-box-demo").click()
-    page1.get_by_role("option", name="python").click()
-    page1.get_by_role("button", name="Containerize").click()
-    page1.locator("div:nth-child(3) > .lm-Widget.lm-Panel.jp-Cell-inputWrapper > .lm-Widget.jp-InputArea > .lm-Widget.jp-CodeMirrorEditor > .cm-editor > .cm-scroller > .cm-content > div:nth-child(2)").click()
-    page1.get_by_role("button", name="Analyze cell").click()
-    page1.locator("#combo-box-demo").click()
-    page1.get_by_role("option", name="python").click()
-    page1.get_by_role("button", name="Containerize").click()
-    page1.get_by_role("button", name="New Launcher").click()
-    page1.locator("#path1").nth(1).click()
-    page1.goto("https://naavre-dev.minikube.test/jupyter/user/user/lab/workspaces/openlab/tree/untitled.naavrewf")
-    page1.get_by_role("textbox").fill("inout")
-    page1.get_by_role("textbox").press("Escape")
-    page1.locator("div").filter(has_text=re.compile(r"^Export WorkflowMake recurringExport$")).nth(1).press("Escape")
-    page1.get_by_text("# input-liststr_list = ['a','").fill("# input_list\n\n\nstr_list = ['a','b','c','d']")
-    page1.get_by_text("# input-liststr_list = ['a','").press("ControlOrMeta+s")
-    page1.once("dialog", lambda dialog: dialog.dismiss())
-    page1.goto("https://naavre-dev.minikube.test/jupyter/user/user/lab/workspaces/openlab/tree/untitled.naavrewf")
+    expect(page.get_by_role("button", name="Start Virtual Lab")).to_be_visible()
+    return page
+
+
+@pytest.fixture
+def workspace_page(authenticated_page: Page) -> Page:
+    with authenticated_page.expect_popup() as popup:
+        authenticated_page.get_by_role("button", name="Start Virtual Lab").click()
+
+    workspace = popup.value
+    workspace.goto(JUPYTER_WORKSPACE_URL)
+    return workspace
+
+
+@pytest.fixture
+def notebook_page(workspace_page: Page) -> Page:
+    workspace_page.locator(".jp-LauncherCard-icon").first.click()
+    expect(workspace_page.get_by_role("textbox").first).to_be_visible()
+    return workspace_page
+
+
+def test_user_can_sign_in_to_open_lab(authenticated_page: Page) -> None:
+    expect(authenticated_page.get_by_role("button", name="Start Virtual Lab")).to_be_visible()
+
+
+def test_user_can_start_virtual_lab(workspace_page: Page) -> None:
+    expect(workspace_page).to_have_url(JUPYTER_WORKSPACE_URL)
+
+
+def test_user_can_edit_and_save_notebook(notebook_page: Page) -> None:
+    code = (
+        "str_list = ['a', 'b', 'c', 'd']\n"
+        "new_lines = [line + '_proc' for line in str_list]\n"
+        "assert new_lines == ['a_proc', 'b_proc', 'c_proc', 'd_proc']"
+    )
+    cell = notebook_page.get_by_role("textbox").first
+    cell.fill(code)
+    cell.press("ControlOrMeta+s")
+
+    expect(cell).to_contain_text("new_lines")
+
+
+def test_user_can_run_notebook_cell(notebook_page: Page) -> None:
+    notebook_page.get_by_role("textbox").first.fill(
+        "str_list = ['a', 'b', 'c', 'd']\n"
+        "new_lines = [line + '_proc' for line in str_list]\n"
+        "print(new_lines)"
+    )
+    notebook_page.get_by_role("button", name="Run this cell and advance (").click()
+
+    expect(
+        notebook_page.get_by_text("['a_proc', 'b_proc', 'c_proc', 'd_proc']")
+    ).to_be_visible()
+
+
+def test_user_can_containerize_notebook_cell(notebook_page: Page) -> None:
+    notebook_page.get_by_role("textbox").first.fill("print('containerize me')")
+    notebook_page.get_by_role("button", name="Analyze cell").click()
+    notebook_page.locator("#combo-box-demo").click()
+    notebook_page.get_by_role("option", name="python").click()
+    notebook_page.get_by_role("button", name="Containerize").click()
