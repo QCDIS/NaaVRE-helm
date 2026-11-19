@@ -17,7 +17,6 @@ PASSWORD = os.getenv("E2E_PASSWORD", "user")
 def browser_context_args(browser_context_args):
     return {**browser_context_args, "ignore_https_errors": True}
 
-
 @pytest.fixture
 def authenticated_page(page: Page) -> Page:
     page.goto(APP_URL)
