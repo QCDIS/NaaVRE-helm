@@ -8,6 +8,10 @@ npm install
 
 ## Running Tests
 
+The Python tests in `e2e/e2e-test.py` record browser videos in `videos/`
+relative to the working directory. Videos are saved when each test's browser
+context closes and may contain sensitive information.
+
 First go to the tests' directory:
 
 ```bash
@@ -95,4 +99,3 @@ The following features are covered:
 ## Screenshots
 
 Test screenshots are saved to the `screenshots/` directory during test runs.
-
