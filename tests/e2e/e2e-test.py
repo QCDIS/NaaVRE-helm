@@ -2,7 +2,7 @@ import json
 import os
 import re
 import uuid
-from urllib.parse import quote
+from urllib.parse import parse_qs, quote, urlsplit
 
 import pytest
 from playwright.sync_api import Page, expect
@@ -210,7 +210,21 @@ def test_user_can_compose_and_submit_workflow(notebook_page: Page, created_noteb
     catalog_search = editor.get_by_role("textbox")
     for title, x in (("input-list", 400), ("Splitter", 720),
                      ("str-parallel-processing", 1040)):
-        catalog_search.fill("" if title == "Splitter" else title)
+        if title != "Splitter":
+            with page.expect_response(
+                lambda response: (
+                    "naavre-communicator/external-service" in response.url
+                    and "/workflow-cells/" in response.request.post_data_json["query"]["url"]
+                    and parse_qs(urlsplit(
+                        response.request.post_data_json["query"]["url"]
+                    ).query).get("search") == [title]
+                ),
+                timeout=60_000,
+            ) as search_info:
+                catalog_search.fill(title)
+            assert search_info.value.ok
+            search_result = search_info.value.json()
+            assert search_result["status_code"] == 200, search_result["content"]
         component = editor.locator('[draggable="true"]').filter(
             has=page.locator(f'[aria-label="{title}"]')
         )
@@ -218,6 +232,9 @@ def test_user_can_compose_and_submit_workflow(notebook_page: Page, created_noteb
             component = component.filter(has=page.get_by_label("me", exact=True))
             component = component.filter(has=page.get_by_label("build succeeded"))
         component.first.drag_to(canvas, target_position={"x": x, "y": 260})
+        expect(canvas.locator(".react-draggable").filter(
+            has=page.get_by_label(title, exact=True)
+        )).to_have_count(1)
 
     nodes = canvas.locator(".react-draggable")
     input_node = nodes.filter(has=page.get_by_label("input-list", exact=True))
