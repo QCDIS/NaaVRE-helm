@@ -8,6 +8,27 @@ npm install
 
 ## Running Tests
 
+The Python tests in `e2e/e2e-test.py` record browser videos in `videos/`
+relative to the working directory. Videos are saved when each test's browser
+context closes and may contain sensitive information.
+
+Run the Python notebook tests from the repository root with:
+
+```bash
+python -m pip install -r tests/requirements.txt
+python -m playwright install chromium
+python -m pytest tests/e2e/e2e-test.py --browser chromium
+```
+
+The analysis and containerization tests create notebooks in the configured
+workspace. The containerization test also submits cells to the catalogue and
+may trigger container image builds. The workflow test containerizes all three
+notebook cells, saves a workflow, and submits a run to the workflow engine.
+It matches the reference layout: input list -> splitter -> processing -> merger
+-> assertion.
+Set `E2E_BASE_URL`, `E2E_WORKSPACE_URL`, `E2E_USERNAME`, and `E2E_PASSWORD` to
+use a different deployment.
+
 First go to the tests' directory:
 
 ```bash
@@ -95,4 +116,3 @@ The following features are covered:
 ## Screenshots
 
 Test screenshots are saved to the `screenshots/` directory during test runs.
-

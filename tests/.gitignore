@@ -23,3 +23,5 @@ Thumbs.db
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/videos/
+/e2e/videos/
