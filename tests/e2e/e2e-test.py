@@ -197,10 +197,10 @@ def test_user_can_containerize_notebook_cells(notebook_page: Page, created_noteb
 def test_user_can_compose_and_submit_workflow(notebook_page: Page, created_notebook: str) -> None:
     page = notebook_page
     open_containerizer(page)
-    for index in range(2):
+    for index in range(3):
         containerize_cell(page, index)
 
-    page.set_viewport_size({"width": 1600, "height": 1000})
+    page.set_viewport_size({"width": 2400, "height": 1000})
     page.get_by_role("menuitem", name="File", exact=True).click()
     page.get_by_role("menuitem", name="New Launcher").click()
     page.get_by_text("Experiment Manager", exact=True).click()
@@ -208,9 +208,14 @@ def test_user_can_compose_and_submit_workflow(notebook_page: Page, created_noteb
     editor = page.get_by_role("region", name="notebook content")
     canvas = editor.locator("div[tabindex='0'][config]")
     catalog_search = editor.get_by_role("textbox")
-    for title, x in (("input-list", 400), ("Splitter", 720),
-                     ("str-parallel-processing", 1040)):
-        if title != "Splitter":
+    for title, x, y in (
+        ("input-list", 400, 260),
+        ("Splitter", 720, 260),
+        ("str-parallel-processing", 1040, 260),
+        ("Merger", 1409, 254),
+        ("assert-new-lines", 1686, 262),
+    ):
+        if title not in ("Splitter", "Merger"):
             with page.expect_response(
                 lambda response: (
                     "naavre-communicator/external-service" in response.url
@@ -228,10 +233,10 @@ def test_user_can_compose_and_submit_workflow(notebook_page: Page, created_noteb
         component = editor.locator('[draggable="true"]').filter(
             has=page.locator(f'[aria-label="{title}"]')
         )
-        if title != "Splitter":
+        if title not in ("Splitter", "Merger"):
             component = component.filter(has=page.get_by_label("me", exact=True))
             component = component.filter(has=page.get_by_label("build succeeded"))
-        component.first.drag_to(canvas, target_position={"x": x, "y": 260})
+        component.first.drag_to(canvas, target_position={"x": x, "y": y})
         expect(canvas.locator(".react-draggable").filter(
             has=page.get_by_label(title, exact=True)
         )).to_have_count(1)
@@ -240,11 +245,19 @@ def test_user_can_compose_and_submit_workflow(notebook_page: Page, created_noteb
     input_node = nodes.filter(has=page.get_by_label("input-list", exact=True))
     splitter = nodes.filter(has=page.get_by_label("Splitter", exact=True))
     processing = nodes.filter(has=page.get_by_label("str-parallel-processing", exact=True))
+    merger = nodes.filter(has=page.get_by_label("Merger", exact=True))
+    assertion = nodes.filter(has=page.get_by_label("assert-new-lines", exact=True))
     input_node.locator('[data-port-id="str_list"] [aria-label="str_list"] > div:last-child').drag_to(
         splitter.locator('[data-port-id="splitter_source"] [aria-label="splitter_source"] > div')
     )
     splitter.locator('[data-port-id="splitter_target"] [aria-label="splitter_target"] > div').drag_to(
         processing.locator('[data-port-id="str_list"] [aria-label="str_list"] > div:first-child')
+    )
+    processing.locator('[data-port-id="new_lines"] [aria-label="new_lines"] > div:last-child').drag_to(
+        merger.locator('[data-port-id="merger_source"] [aria-label="merger_source"] > div')
+    )
+    merger.locator('[data-port-id="merger_target"] [aria-label="merger_target"] > div').drag_to(
+        assertion.locator('[data-port-id="new_lines"] [aria-label="new_lines"] > div:first-child')
     )
 
     workflow_name = f"workflow-{uuid.uuid4().hex}.naavrewf"
@@ -264,7 +277,7 @@ def test_user_can_compose_and_submit_workflow(notebook_page: Page, created_noteb
     saved_response = page.request.get(contents_url)
     assert saved_response.ok
     chart = json.loads(saved_response.json()["content"])["chart"]
-    assert len(chart["nodes"]) == 3
+    assert len(chart["nodes"]) == 5
     node_ids = {}
     for node_id, node in chart["nodes"].items():
         cell = node["properties"]["cell"]
@@ -272,7 +285,23 @@ def test_user_can_compose_and_submit_workflow(notebook_page: Page, created_noteb
         if cell.get("owner"):
             title = title.removesuffix(f"-{cell['owner']}")
         node_ids[title] = node_id
-    assert set(node_ids) == {"input-list", "Splitter", "str-parallel-processing"}
+    assert set(node_ids) == {
+        "input-list", "Splitter", "str-parallel-processing", "Merger", "assert-new-lines"
+    }
+    expected_nodes = {
+        "input-list": ("workflow-cell", {"str_list": "right"}, (400, 260)),
+        "Splitter": ("splitter", {"splitter_source": "left", "splitter_target": "right"}, (720, 260)),
+        "str-parallel-processing": ("workflow-cell", {"str_list": "left", "new_lines": "right"}, (1040, 260)),
+        "Merger": ("merger", {"merger_source": "left", "merger_target": "right"}, (1409, 254)),
+        "assert-new-lines": ("workflow-cell", {"new_lines": "left"}, (1686, 262)),
+    }
+    for title, (node_type, ports, position) in expected_nodes.items():
+        node = chart["nodes"][node_ids[title]]
+        assert node["type"] == node_type
+        assert {name: port["type"] for name, port in node["ports"].items()} == ports
+        assert node["position"]["x"] == pytest.approx(position[0], abs=3)
+        assert node["position"]["y"] == pytest.approx(position[1], abs=3)
+    assert chart["properties"]["params"] == []
     links = {
         (link["from"]["nodeId"], link["from"]["portId"],
          link["to"]["nodeId"], link["to"]["portId"])
@@ -281,6 +310,8 @@ def test_user_can_compose_and_submit_workflow(notebook_page: Page, created_noteb
     assert links == {
         (node_ids["input-list"], "str_list", node_ids["Splitter"], "splitter_source"),
         (node_ids["Splitter"], "splitter_target", node_ids["str-parallel-processing"], "str_list"),
+        (node_ids["str-parallel-processing"], "new_lines", node_ids["Merger"], "merger_source"),
+        (node_ids["Merger"], "merger_target", node_ids["assert-new-lines"], "new_lines"),
     }
 
     page.get_by_role("button", name="Run", exact=True).click()
